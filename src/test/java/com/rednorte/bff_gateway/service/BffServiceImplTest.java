@@ -38,7 +38,7 @@ class BffServiceImplTest {
     @InjectMocks
     private BffServiceImpl bffService;
 
-    // ─── Reasignaciones ───────────────────────────────────────────────────────
+    //  Reasignaciones
 
     @Test
     @DisplayName("crearReasignacion debe retornar respuesta exitosa")
@@ -107,7 +107,7 @@ class BffServiceImplTest {
         verify(reasignacionClient).listarPorEstado("PENDIENTE");
     }
 
-    // ─── Lista Espera ─────────────────────────────────────────────────────────
+    // Lista Espera
 
     @Test
     @DisplayName("obtenerListaEspera debe retornar lista completa")
@@ -158,7 +158,7 @@ class BffServiceImplTest {
         verify(listaEsperaClient).obtenerPorPaciente(1L);
     }
 
-    // ─── Fallbacks ────────────────────────────────────────────────────────────
+    //Fallbacks
 
     @Test
     @DisplayName("fallbackReasignacion debe retornar respuesta de error 503")
