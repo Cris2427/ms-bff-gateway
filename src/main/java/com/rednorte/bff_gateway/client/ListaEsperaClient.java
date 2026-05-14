@@ -21,7 +21,7 @@ public interface ListaEsperaClient {
      * @return la lista completa de los pacientes
      */
 
-    @GetMapping("/api/lista-espera")
+    @GetMapping("/api/solicitudes")
     List<ListaEsperaDTO> obtenerListaCompleta();
 
     /**
@@ -30,7 +30,7 @@ public interface ListaEsperaClient {
      * @return devuelve lista de pacientes en espera
      */
 
-    @GetMapping("/api/lista-espera/especialidad")
+    @GetMapping("/api/solicitudes")
     List<ListaEsperaDTO> obtenerPorEspecialidad(@RequestParam("especialidad") String especialidad);
 
     /**
@@ -39,6 +39,6 @@ public interface ListaEsperaClient {
      * @return entrega el resumen del paciente solicitado con su posicion en la lista de espera
      */
 
-    @GetMapping("/api/lista-espera/paciente/{pacienteId}")
+    @GetMapping("/api/solicitudes/paciente/{pacienteId}")
     PacienteResumenDTO obtenerPorPaciente(@PathVariable("pacienteId") Long pacienteId);
 }
