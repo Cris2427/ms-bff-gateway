@@ -1,7 +1,10 @@
 package com.rednorte.bff_gateway.controller;
 
-
-import com.rednorte.bff_gateway.dto.*;
+import com.rednorte.bff_gateway.dto.ApiResponseDTO;
+import com.rednorte.bff_gateway.dto.ListaEsperaDTO;
+import com.rednorte.bff_gateway.dto.PacienteResumenDTO;
+import com.rednorte.bff_gateway.dto.ReasignacionDTO;
+import com.rednorte.bff_gateway.dto.ReasignacionRequestDTO;
 import com.rednorte.bff_gateway.service.BffService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -11,34 +14,38 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 /**
- * Controlador principal de BFF Gateway de RedNorte
- * Expone los endpoints unificados paara el front,
- * delegando la logica al link de BffService
+ * Controlador principal del BFF Gateway.
+ * Expone los endpoints unificados para el frontend de RedNorte,
+ * delegando la logica al servicio BFF con proteccion Circuit Breaker.
  */
 @RestController
 @RequestMapping("/api/bff")
 @RequiredArgsConstructor
-@Tag(name = "BFF gateway", description = "Endpoints unificados para el frontend de RedNorte")
-
+@Tag(name = "BFF Gateway", description = "Endpoints unificados para el frontend de RedNorte")
 public class BffController {
 
     private final BffService bffService;
-
     /**
-     * crea nueva reasignacion de cita
+     * Crea una nueva reasignacion delegando al ms-reasignacion.
      * @param request datos de la solicitud
-     * @return reasignacion creada con estado 201
+     * @return respuesta estandarizada con la reasignacion creada
      */
-    @Operation(summary = "Crear reasignacion", description = "Inicia el proceso de reasignacion automatica de una cita cancelada")
+    @Operation(summary = "Crear reasignacion", description = "Inicia una reasignacion automatica de cita medica")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Reasignacion creada exitosamente"),
             @ApiResponse(responseCode = "400", description = "Datos de entrada invalidos"),
-            @ApiResponse(responseCode = "503", description = "Servicio no disponible")
+            @ApiResponse(responseCode = "503", description = "Servicio no disponible - Circuit Breaker activo")
     })
     @PostMapping("/reasignaciones")
     public ResponseEntity<ApiResponseDTO<ReasignacionDTO>> crearReasignacion(
@@ -48,14 +55,14 @@ public class BffController {
     }
 
     /**
-     * obtiene una reasignacion
-     * @param id
-     * @return devuelve la reasignacion encontrada
+     * Obtiene una reasignacion por su ID.
+     * @param id identificador de la reasignacion
+     * @return respuesta estandarizada con la reasignacion encontrada
      */
     @Operation(summary = "Obtener reasignacion por ID")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Reasignacion encontrada"),
-            @ApiResponse(responseCode = "503", description = "Servicio no disponible")
+            @ApiResponse(responseCode = "503", description = "Servicio no disponible - Circuit Breaker activo")
     })
     @GetMapping("/reasignaciones/{id}")
     public ResponseEntity<ApiResponseDTO<ReasignacionDTO>> obtenerReasignacion(
@@ -64,8 +71,8 @@ public class BffController {
     }
 
     /**
-     * Lista todas las reasignaciones registradas
-     * @return lista completa de reasignacione
+     * Lista todas las reasignaciones registradas.
+     * @return respuesta estandarizada con la lista completa
      */
     @Operation(summary = "Listar todas las reasignaciones")
     @ApiResponse(responseCode = "200", description = "Lista obtenida exitosamente")
@@ -75,9 +82,9 @@ public class BffController {
     }
 
     /**
-     * Lista reasignaciones filtradas por estado
-     * @param estado estado a filtrar (PENDIENTE, COMPLETADA, FALLIDA, CANCELADA)
-     * @return lista filtrada
+     * Lista reasignaciones filtradas por estado.
+     * @param estado estado a filtrar
+     * @return respuesta estandarizada con la lista filtrada
      */
     @Operation(summary = "Listar reasignaciones por estado")
     @ApiResponse(responseCode = "200", description = "Lista filtrada obtenida exitosamente")
@@ -88,8 +95,8 @@ public class BffController {
     }
 
     /**
-     * Obtiene la lista completa de pacientes en espera
-     * @return lista de espera completa
+     * Obtiene la lista completa de pacientes en espera.
+     * @return respuesta estandarizada con la lista de espera
      */
     @Operation(summary = "Obtener lista de espera completa")
     @ApiResponse(responseCode = "200", description = "Lista de espera obtenida exitosamente")
@@ -99,9 +106,9 @@ public class BffController {
     }
 
     /**
-     * Obtiene la lista de espera filtrada por especialidad
-     * @param especialidad nombre de la especialidad medica
-     * @return lista filtrada
+     * Obtiene pacientes en espera filtrados por especialidad.
+     * @param especialidad nombre de la especialidad
+     * @return respuesta estandarizada con la lista filtrada
      */
     @Operation(summary = "Obtener lista de espera por especialidad")
     @ApiResponse(responseCode = "200", description = "Lista filtrada obtenida exitosamente")
@@ -112,15 +119,12 @@ public class BffController {
     }
 
     /**
-     * Obtiene el resumen de un paciente en lista de espera
+     * Obtiene el resumen de un paciente en lista de espera.
      * @param pacienteId ID del paciente
-     * @return resumen del paciente con su posicion
+     * @return respuesta estandarizada con el resumen del paciente
      */
     @Operation(summary = "Obtener resumen de paciente en lista de espera")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Resumen obtenido exitosamente"),
-            @ApiResponse(responseCode = "503", description = "Servicio no disponible")
-    })
+    @ApiResponse(responseCode = "200", description = "Resumen obtenido exitosamente")
     @GetMapping("/lista-espera/paciente/{pacienteId}")
     public ResponseEntity<ApiResponseDTO<PacienteResumenDTO>> obtenerResumenPaciente(
             @PathVariable Long pacienteId) {
