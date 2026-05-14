@@ -10,10 +10,7 @@ import java.time.LocalDateTime;
 
 /**
  * DTO envolvente (wrapper) genérico para todas las respuestas del BFF hacia el frontend.
- *
- * <p>Estandariza la estructura de respuesta HTTP del gateway, permitiendo al frontend
- * manejar tanto respuestas exitosas como errores de forma consistente.</p>
- *
+
  * @param <T> Tipo del payload de datos contenido en la respuesta
  */
 @Data
@@ -28,7 +25,6 @@ public class ApiResponseDTO<T> {
 
     /**
      * Indica si la operación fue exitosa.
-     *
      * @return {@code true} si la operación fue exitosa
      */
     @Schema(description = "Indica si la operación fue procesada exitosamente", example = "true")
@@ -36,7 +32,6 @@ public class ApiResponseDTO<T> {
 
     /**
      * Código HTTP de la respuesta para referencia del cliente.
-     *
      * @return Código HTTP
      */
     @Schema(description = "Código HTTP de la respuesta", example = "200")
@@ -44,7 +39,6 @@ public class ApiResponseDTO<T> {
 
     /**
      * Mensaje descriptivo del resultado de la operación.
-     *
      * @return Mensaje para el frontend
      */
     @Schema(description = "Mensaje descriptivo del resultado", example = "Operación completada exitosamente")
@@ -53,7 +47,6 @@ public class ApiResponseDTO<T> {
     /**
      * Payload de datos principal de la respuesta. Puede ser un objeto simple,
      * una lista o {@code null} en caso de error.
-     *
      * @return Datos de la respuesta
      */
     @Schema(description = "Datos principales de la respuesta (null en caso de error)")
@@ -61,7 +54,6 @@ public class ApiResponseDTO<T> {
 
     /**
      * Marca de tiempo del momento en que se generó la respuesta en el BFF.
-     *
      * @return Timestamp de la respuesta
      */
     @Schema(description = "Timestamp de generación de la respuesta", example = "2025-06-10T14:30:00")
@@ -70,7 +62,6 @@ public class ApiResponseDTO<T> {
 
     /**
      * Crea una respuesta exitosa con datos.
-     *
      * @param <T>     Tipo de los datos
      * @param data    Payload de la respuesta
      * @param message Mensaje descriptivo
@@ -88,7 +79,6 @@ public class ApiResponseDTO<T> {
 
     /**
      * Crea una respuesta de error sin datos.
-     *
      * @param <T>     Tipo de los datos (usualmente Void o String)
      * @param status  Código HTTP de error
      * @param message Descripción del error
