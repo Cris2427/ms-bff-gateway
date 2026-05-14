@@ -14,7 +14,7 @@ import java.util.List;
  * cliente Feign es para comunicarse con el ms-lista-espera
  * permite al BFF Gateway consultar pacientes en espera y sus posiciones en la lista por especialidad
  */
-@FeignClient(name = "ms-lista-espera", url = ("${ms.solicitudes.url}"))
+@FeignClient(name = "ms-lista-espera", url = "${ms.lista-espera.url}")
 public interface ListaEsperaClient {
     /**
      * obtiene todos los pacientes en lista de espera
