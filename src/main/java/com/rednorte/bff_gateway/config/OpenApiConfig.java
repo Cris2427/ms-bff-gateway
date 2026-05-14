@@ -28,7 +28,7 @@ public class OpenApiConfig {
                                 .name("Equipo RedNorte")
                                 .email("contacto@rednorte.cl")))
                 .servers(List.of(
-                        new Server().url("http://localhost:8080").description("Servidor local")
+                        new Server().url("http://localhost:8085").description("Servidor local")
                 ));
     }
 }
