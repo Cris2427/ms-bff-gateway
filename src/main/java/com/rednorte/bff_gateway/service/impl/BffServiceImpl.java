@@ -28,7 +28,7 @@ public class BffServiceImpl implements BffService {
     private final ReasignacionClient reasignacionClient;
     private final ListaEsperaClient listaEsperaClient;
 
-    // ─── Reasignacion ────────────────────────────────────────────────────────
+    // Reasignacion
 
     /** {@inheritDoc} */
     @Override
@@ -64,7 +64,7 @@ public class BffServiceImpl implements BffService {
         return ApiResponseDTO.ok(reasignacionClient.listarPorEstado(estado), "Lista filtrada por estado");
     }
 
-    // ─── Lista Espera ─────────────────────────────────────────────────────────
+    // Lista Espera
 
     /** {@inheritDoc} */
     @Override
@@ -94,10 +94,10 @@ public class BffServiceImpl implements BffService {
                 "Resumen de paciente obtenido");
     }
 
-    // ─── Fallbacks ────────────────────────────────────────────────────────────
+    //Fallbacks
 
     /**
-     * Fallback para operaciones de reasignacion individual.
+     * Fallback para operaciones de reasignacion individual
      * @param t excepcion capturada
      * @return respuesta de error estandarizada
      */

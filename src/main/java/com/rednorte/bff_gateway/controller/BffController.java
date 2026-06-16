@@ -100,7 +100,7 @@ public class BffController {
      */
     @Operation(summary = "Obtener lista de espera completa")
     @ApiResponse(responseCode = "200", description = "Lista de espera obtenida exitosamente")
-    @GetMapping("/lista-espera")
+    @GetMapping("/solicitudes")
     public ResponseEntity<ApiResponseDTO<List<ListaEsperaDTO>>> obtenerListaEspera() {
         return ResponseEntity.ok(bffService.obtenerListaEspera());
     }
@@ -112,7 +112,7 @@ public class BffController {
      */
     @Operation(summary = "Obtener lista de espera por especialidad")
     @ApiResponse(responseCode = "200", description = "Lista filtrada obtenida exitosamente")
-    @GetMapping("/lista-espera/especialidad")
+    @GetMapping("/solicitudes/especialidad")
     public ResponseEntity<ApiResponseDTO<List<ListaEsperaDTO>>> obtenerListaEsperaPorEspecialidad(
             @RequestParam String especialidad) {
         return ResponseEntity.ok(bffService.obtenerListaEsperaPorEspecialidad(especialidad));
@@ -125,7 +125,7 @@ public class BffController {
      */
     @Operation(summary = "Obtener resumen de paciente en lista de espera")
     @ApiResponse(responseCode = "200", description = "Resumen obtenido exitosamente")
-    @GetMapping("/lista-espera/paciente/{pacienteId}")
+    @GetMapping("/solicitudes/paciente/{pacienteId}")
     public ResponseEntity<ApiResponseDTO<PacienteResumenDTO>> obtenerResumenPaciente(
             @PathVariable Long pacienteId) {
         return ResponseEntity.ok(bffService.obtenerResumenPaciente(pacienteId));

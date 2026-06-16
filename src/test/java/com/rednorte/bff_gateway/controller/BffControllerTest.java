@@ -119,7 +119,7 @@ class BffControllerTest {
     // Lista Espera
 
     @Test
-    @DisplayName("GET /lista-espera debe retornar 200 con lista completa")
+    @DisplayName("GET /solicitudes debe retornar 200 con lista completa")
     void obtenerListaEspera_debeRetornar200() {
         List<ListaEsperaDTO> lista = Arrays.asList(
                 ListaEsperaDTO.builder().id(1L).especialidad("Cardiologia").build(),
@@ -140,7 +140,7 @@ class BffControllerTest {
     }
 
     @Test
-    @DisplayName("GET /lista-espera/especialidad debe retornar 200 con lista filtrada")
+    @DisplayName("GET /solicitudes/especialidad debe retornar 200 con lista filtrada")
     void obtenerListaEsperaPorEspecialidad_debeRetornar200() {
         List<ListaEsperaDTO> lista = Arrays.asList(
                 ListaEsperaDTO.builder().id(1L).especialidad("Cardiologia").build()
@@ -160,7 +160,7 @@ class BffControllerTest {
     }
 
     @Test
-    @DisplayName("GET /lista-espera/paciente/{id} debe retornar 200 con resumen del paciente")
+    @DisplayName("GET /solicitudes/paciente/{id} debe retornar 200 con resumen del paciente")
     void obtenerResumenPaciente_debeRetornar200() {
         PacienteResumenDTO resumen = PacienteResumenDTO.builder()
                 .id(1L).nombreCompleto("Juan Perez").build();

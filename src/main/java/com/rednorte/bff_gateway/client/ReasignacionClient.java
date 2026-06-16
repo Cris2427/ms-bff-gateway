@@ -32,14 +32,14 @@ public interface ReasignacionClient {
      * @param id identificador de la reasignacion
      * @return reasignacion encontrada
      */
-    @GetMapping("/api/reasignaciones/{id}")
+    @GetMapping("/api/v1/reasignaciones/{id}")
     ReasignacionDTO obtenerPorId(@PathVariable("id") Long id);
 
     /**
      * Lista todas las reasignaciones registradas.
      * @return lista completa de reasignaciones
      */
-    @GetMapping("/api/reasignaciones")
+    @GetMapping("/api/v1/reasignaciones")
     List<ReasignacionDTO> listarTodas();
 
     /**
@@ -47,6 +47,6 @@ public interface ReasignacionClient {
      * @param estado estado a filtrar
      * @return lista filtrada de reasignaciones
      */
-    @GetMapping("/api/reasignaciones/estado")
+    @GetMapping("/api/v1/reasignaciones/estado")
     List<ReasignacionDTO> listarPorEstado(@RequestParam("estado") String estado);
 }
