@@ -14,14 +14,14 @@ import java.util.List;
  * cliente Feign es para comunicarse con el ms-lista-espera
  * permite al BFF Gateway consultar pacientes en espera y sus posiciones en la lista por especialidad
  */
-@FeignClient(name = "ms-lista-espera", url = "${ms.solicitudes.url}")
+@FeignClient(name = "ms-solicitudes", url = "${ms.solicitudes.url}")
 public interface ListaEsperaClient {
     /**
      * obtiene todos los pacientes en lista de espera
      * @return la lista completa de los pacientes
      */
 
-    @GetMapping("/api/solicitudes")
+    @GetMapping("/api/v1/solicitudes")
     List<ListaEsperaDTO> obtenerListaCompleta();
 
     /**
@@ -30,7 +30,7 @@ public interface ListaEsperaClient {
      * @return devuelve lista de pacientes en espera
      */
 
-    @GetMapping("/api/solicitudes")
+    @GetMapping("/api/v1/solicitudes")
     List<ListaEsperaDTO> obtenerPorEspecialidad(@RequestParam("especialidad") String especialidad);
 
     /**
@@ -39,6 +39,6 @@ public interface ListaEsperaClient {
      * @return entrega el resumen del paciente solicitado con su posicion en la lista de espera
      */
 
-    @GetMapping("/api/solicitudes/paciente/{pacienteId}")
+    @GetMapping("/api/v1/solicitudes/paciente/{pacienteId}")
     PacienteResumenDTO obtenerPorPaciente(@PathVariable("pacienteId") Long pacienteId);
 }

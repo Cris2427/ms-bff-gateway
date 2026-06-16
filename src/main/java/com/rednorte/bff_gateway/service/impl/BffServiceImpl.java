@@ -28,7 +28,7 @@ public class BffServiceImpl implements BffService {
     private final ReasignacionClient reasignacionClient;
     private final ListaEsperaClient listaEsperaClient;
 
-    // ─── Reasignacion ────────────────────────────────────────────────────────
+    // Reasignacion
 
     /** {@inheritDoc} */
     @Override
