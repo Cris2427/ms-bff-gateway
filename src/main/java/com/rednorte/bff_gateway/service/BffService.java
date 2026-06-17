@@ -66,4 +66,6 @@ public interface BffService {
 
     // lsita todos los pacientes registrados
     ApiResponseDTO<List<PacienteDTO>> obtenerPacientes();
+
+    ApiResponseDTO<List<CitaDTO>>  obtenerCitas();
 }

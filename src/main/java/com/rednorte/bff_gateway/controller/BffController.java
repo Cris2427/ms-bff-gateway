@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.rednorte.bff_gateway.dto.PacienteDTO;
+import com.rednorte.bff_gateway.dto.CitaDTO;
 
 import java.util.List;
 
@@ -137,5 +138,12 @@ public class BffController {
     @GetMapping("/pacientes")
     public ResponseEntity<ApiResponseDTO<List<PacienteDTO>>> obtenerPacientes() {
         return ResponseEntity.ok(bffService.obtenerPacientes());
+    }
+
+    @Operation(summary = "Listar citas")
+    @ApiResponse(responseCode = "200", description = "Lista de citas obtenida")
+    @GetMapping("/citas")
+    public ResponseEntity<ApiResponseDTO<List<CitaDTO>>> obtenerCitas() {
+        return ResponseEntity.ok(bffService.obtenerCitas());
     }
 }
