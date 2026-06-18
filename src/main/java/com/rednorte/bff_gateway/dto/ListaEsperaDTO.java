@@ -67,18 +67,18 @@ public class ListaEsperaDTO {
 
     /**
      * Estado actual del registro en la lista de espera.
-     * @return Estado del registro
      */
     @Schema(description = "Estado del registro en lista de espera",
             example = "ACTIVO",
             allowableValues = {"ACTIVO", "ASIGNADO", "CANCELADO"})
     private String estado;
 
-    /**
-     * Cantidad estimada de días de espera según la demanda actual de la especialidad.
-     * Calculado por el BFF en base a estadísticas del servicio de listas de espera.
-     * @return Días estimados de espera
-     */
     @Schema(description = "Días estimados de espera calculados por el BFF", example = "15")
     private Integer diasEsperaEstimados;
+
+    private Long pacienteId;
+
+    private String tipo;
+
+    private java.time.LocalDateTime creadoEn;
 }
