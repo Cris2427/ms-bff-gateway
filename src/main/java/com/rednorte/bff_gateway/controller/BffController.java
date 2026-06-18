@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.rednorte.bff_gateway.dto.PacienteDTO;
+import com.rednorte.bff_gateway.dto.CitaDTO;
 
 import java.util.List;
 
@@ -129,5 +131,19 @@ public class BffController {
     public ResponseEntity<ApiResponseDTO<PacienteResumenDTO>> obtenerResumenPaciente(
             @PathVariable Long pacienteId) {
         return ResponseEntity.ok(bffService.obtenerResumenPaciente(pacienteId));
+    }
+
+    @Operation(summary = "Listar pacientes")
+    @ApiResponse(responseCode = "200", description = "Lista de pacientes obtenida")
+    @GetMapping("/pacientes")
+    public ResponseEntity<ApiResponseDTO<List<PacienteDTO>>> obtenerPacientes() {
+        return ResponseEntity.ok(bffService.obtenerPacientes());
+    }
+
+    @Operation(summary = "Listar citas")
+    @ApiResponse(responseCode = "200", description = "Lista de citas obtenida")
+    @GetMapping("/citas")
+    public ResponseEntity<ApiResponseDTO<List<CitaDTO>>> obtenerCitas() {
+        return ResponseEntity.ok(bffService.obtenerCitas());
     }
 }

@@ -12,6 +12,10 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import com.rednorte.bff_gateway.dto.PacienteDTO;
+import com.rednorte.bff_gateway.client.PacienteClient;
+import com.rednorte.bff_gateway.dto.CitaDTO;
+import com.rednorte.bff_gateway.client.CitaClient;
 
 import java.util.List;
 
@@ -27,7 +31,8 @@ public class BffServiceImpl implements BffService {
 
     private final ReasignacionClient reasignacionClient;
     private final ListaEsperaClient listaEsperaClient;
-
+    private final PacienteClient pacienteClient;
+    private final CitaClient citaClient;
     // Reasignacion
 
     /** {@inheritDoc} */
@@ -94,6 +99,22 @@ public class BffServiceImpl implements BffService {
                 "Resumen de paciente obtenido");
     }
 
+    /** {@inheritDoc} */
+    @Override
+    @CircuitBreaker(name = "pacientesCB", fallbackMethod = "fallbackPacientes")
+    public ApiResponseDTO<List<PacienteDTO>> obtenerPacientes() {
+        log.info("BFF: obteniendo todos los pacientes");
+        return ApiResponseDTO.ok(pacienteClient.obtenerTodos(), "Lista de pacientes obtenida");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    @CircuitBreaker(name = "citasCB", fallbackMethod = "fallbackCitas")
+    public ApiResponseDTO<List<CitaDTO>> obtenerCitas() {
+        log.info("BFF: obteniendo todas las citas");
+        return ApiResponseDTO.ok(citaClient.obtenerTodas(), "Lista de citas obtenida");
+    }
+
     //Fallbacks
 
     /**
@@ -134,5 +155,15 @@ public class BffServiceImpl implements BffService {
     public ApiResponseDTO<PacienteResumenDTO> fallbackResumenPaciente(Throwable t) {
         log.error("Circuit Breaker activado para resumen paciente: {}", t.getMessage());
         return ApiResponseDTO.error(503, "Servicio de lista de espera no disponible temporalmente");
+    }
+
+    public ApiResponseDTO<List<PacienteDTO>> fallbackPacientes(Throwable t) {
+        log.error("Circuit Breaker activado para pacientes: {}", t.getMessage());
+        return ApiResponseDTO.error(503, "Servicio de pacientes no disponible temporalmente");
+    }
+
+    public ApiResponseDTO<List<CitaDTO>> fallbackCitas(Throwable t) {
+        log.error("Circuit Breaker activado para citas: {}", t.getMessage());
+        return ApiResponseDTO.error(503, "Servicio de citas no disponible temporalmente");
     }
 }

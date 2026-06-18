@@ -24,7 +24,7 @@ public interface ReasignacionClient {
      * @param request datos de la solicitud de reasignacion
      * @return reasignacion creada
      */
-    @PostMapping("/api/reasignaciones")
+    @PostMapping("/api/v1/reasignaciones")
     ReasignacionDTO crearReasignacion(@RequestBody ReasignacionRequestDTO request);
 
     /**
@@ -47,6 +47,6 @@ public interface ReasignacionClient {
      * @param estado estado a filtrar
      * @return lista filtrada de reasignaciones
      */
-    @GetMapping("/api/v1/reasignaciones/estado")
+    @GetMapping("/api/v1/reasignaciones/estado/{estado}")
     List<ReasignacionDTO> listarPorEstado(@RequestParam("estado") String estado);
 }

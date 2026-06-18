@@ -63,4 +63,9 @@ public interface BffService {
      */
 
     ApiResponseDTO<PacienteResumenDTO> obtenerResumenPaciente(Long pacienteId);
+
+    // lsita todos los pacientes registrados
+    ApiResponseDTO<List<PacienteDTO>> obtenerPacientes();
+
+    ApiResponseDTO<List<CitaDTO>>  obtenerCitas();
 }
