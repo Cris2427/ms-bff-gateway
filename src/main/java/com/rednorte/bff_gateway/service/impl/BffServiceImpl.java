@@ -8,6 +8,11 @@ import com.rednorte.bff_gateway.dto.PacienteResumenDTO;
 import com.rednorte.bff_gateway.dto.ReasignacionDTO;
 import com.rednorte.bff_gateway.dto.ReasignacionRequestDTO;
 import com.rednorte.bff_gateway.service.BffService;
+import com.rednorte.bff_gateway.client.AuthClient;
+import com.rednorte.bff_gateway.dto.LoginRequestDTO;
+import com.rednorte.bff_gateway.dto.LoginResponseDTO;
+import com.rednorte.bff_gateway.dto.RegistroRequestDTO;
+import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +38,7 @@ public class BffServiceImpl implements BffService {
     private final ListaEsperaClient listaEsperaClient;
     private final PacienteClient pacienteClient;
     private final CitaClient citaClient;
+    private final AuthClient authClient;
     // Reasignacion
 
     /** {@inheritDoc} */
@@ -113,6 +119,34 @@ public class BffServiceImpl implements BffService {
     public ApiResponseDTO<List<CitaDTO>> obtenerCitas() {
         log.info("BFF: obteniendo todas las citas");
         return ApiResponseDTO.ok(citaClient.obtenerTodas(), "Lista de citas obtenida");
+    }
+
+    // Auth
+
+    /** {@inheritDoc} */
+    @Override
+    public ApiResponseDTO<LoginResponseDTO> login(LoginRequestDTO request) {
+        log.info("BFF: login de usuario: {}", request.getUsername());
+        try {
+            LoginResponseDTO data = authClient.login(request);
+            return ApiResponseDTO.ok(data, "Login exitoso");
+        } catch (FeignException.Unauthorized e) {
+            log.warn("BFF: credenciales invalidas para: {}", request.getUsername());
+            return ApiResponseDTO.error(401, "Usuario o contrasena incorrectos");
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ApiResponseDTO<LoginResponseDTO> registrar(RegistroRequestDTO request) {
+        log.info("BFF: registro de usuario: {}", request.getUsername());
+        try {
+            LoginResponseDTO data = authClient.registrar(request);
+            return ApiResponseDTO.ok(data, "Usuario registrado exitosamente");
+        } catch (FeignException.BadRequest e) {
+            log.warn("BFF: registro invalido para: {}", request.getUsername());
+            return ApiResponseDTO.error(400, "El usuario ya existe o los datos son invalidos");
+        }
     }
 
     //Fallbacks

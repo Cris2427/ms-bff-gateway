@@ -23,6 +23,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.rednorte.bff_gateway.dto.PacienteDTO;
 import com.rednorte.bff_gateway.dto.CitaDTO;
+import com.rednorte.bff_gateway.dto.LoginRequestDTO;
+import com.rednorte.bff_gateway.dto.LoginResponseDTO;
+import com.rednorte.bff_gateway.dto.RegistroRequestDTO;
 
 import java.util.List;
 
@@ -145,5 +148,27 @@ public class BffController {
     @GetMapping("/citas")
     public ResponseEntity<ApiResponseDTO<List<CitaDTO>>> obtenerCitas() {
         return ResponseEntity.ok(bffService.obtenerCitas());
+    }
+
+    @Operation(summary = "Login de usuario", description = "Autentica un usuario contra ms-auth")
+    @ApiResponses ({
+            @ApiResponse(responseCode = "200", description = "Login exitoso"),
+            @ApiResponse(responseCode = "401", description = "Credenciales invalidas")
+    })
+    @PostMapping("/auth/login")
+    public ResponseEntity<ApiResponseDTO<LoginResponseDTO>> login(
+            @RequestBody LoginRequestDTO request) {
+        return ResponseEntity.ok(bffService.login(request));
+    }
+
+    @Operation(summary = "Registro de usuario", description = "Crea un nuevo usuario en ms-auth")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Usuario registrado"),
+            @ApiResponse(responseCode = "400", description = "Datos invalidos o usuario existente")
+    })
+    @PostMapping("/auth/registro")
+    public ResponseEntity<ApiResponseDTO<LoginResponseDTO>> registrar(
+            @RequestBody RegistroRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(bffService.registrar(request));
     }
 }
