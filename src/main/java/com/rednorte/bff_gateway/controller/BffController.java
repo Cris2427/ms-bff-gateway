@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.rednorte.bff_gateway.dto.ReasignacionResultadoDTO;
 import com.rednorte.bff_gateway.dto.PacienteDTO;
 import com.rednorte.bff_gateway.dto.CitaDTO;
 import com.rednorte.bff_gateway.dto.LoginRequestDTO;
@@ -198,5 +199,18 @@ public class BffController {
     public ResponseEntity<ApiResponseDTO<List<CitaDTO>>> obtenerCitasPorMedico(
             @RequestParam String nombreMedico) {
         return ResponseEntity.ok(bffService.obtenerCitasPorMedico(nombreMedico));
+    }
+
+    @Operation(summary = "Procesar reasignacion real",
+            description = "Cancela la cita, libera la hora y la reasigna al paciente de mayor prioridad")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Reasignacion procesada"),
+            @ApiResponse(responseCode = "404", description = "Cita no encontrada")
+    })
+    @PostMapping("/reasignaciones/procesar/{citaId}")
+    public ResponseEntity<ApiResponseDTO<ReasignacionResultadoDTO>> procesarReasignacion(
+            @PathVariable Long citaId,
+            @RequestParam(required = false) String motivo) {
+        return ResponseEntity.ok(bffService.procesarReasignacion(citaId, motivo));
     }
 }

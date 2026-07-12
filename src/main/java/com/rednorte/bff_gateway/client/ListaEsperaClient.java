@@ -7,7 +7,10 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.Map;
 import java.util.List;
 
 /**
@@ -41,4 +44,7 @@ public interface ListaEsperaClient {
 
     @GetMapping("/api/solicitudes/paciente/{pacienteId}")
     PacienteResumenDTO obtenerPorPaciente(@PathVariable("pacienteId") Long pacienteId);
+
+    @PatchMapping("/api/solicitudes/{id}/estado")
+    void cambiarEstado(@PathVariable("id") Long id, @RequestBody Map<String, String> body);
 }

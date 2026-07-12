@@ -79,4 +79,7 @@ public interface BffService {
     ApiResponseDTO<List<CitaDTO>> obtenerCitasPorPaciente(Long pacienteId);
 
     ApiResponseDTO<List<CitaDTO>> obtenerCitasPorMedico(String nombreMedico);
+
+    // Reasignacion real (orquestada)
+    ApiResponseDTO<ReasignacionResultadoDTO> procesarReasignacion(Long citaId, String motivo);
 }

@@ -22,7 +22,11 @@ import com.rednorte.bff_gateway.client.PacienteClient;
 import com.rednorte.bff_gateway.dto.CitaDTO;
 import com.rednorte.bff_gateway.client.CitaClient;
 import com.rednorte.bff_gateway.dto.CitaRequestDTO;
+import com.rednorte.bff_gateway.dto.ReasignacionResultadoDTO;
 
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Optional;
 import java.util.List;
 
 /**
@@ -184,6 +188,85 @@ public class BffServiceImpl implements BffService {
     public ApiResponseDTO<CitaDTO> fallbackCita(Throwable t) {
         log.error("Circuit Breaker activado para cita: {}", t.getMessage());
         return ApiResponseDTO.error(503, "Servicio de citas no disponible temporalmente");
+    }
+
+    // Reasignacion real (orquestada por el BFF)
+
+    /** {@inheritDoc} */
+    @Override
+    public ApiResponseDTO<ReasignacionResultadoDTO> procesarReasignacion(Long citaId, String motivo) {
+        log.info("BFF: procesando reasignacion real de cita ID: {} ({})", citaId, motivo);
+        try {
+            // 1. Traer la cita original (para conocer su hora, medico y especialidad)
+            CitaDTO citaOriginal = citaClient.obtenerPorId(citaId);
+
+            // 2. Cancelar la cita -> libera la hora
+            citaClient.cancelar(citaId);
+
+            // 3. Buscar al paciente PENDIENTE de mayor prioridad en lista de espera
+            List<ListaEsperaDTO> espera = listaEsperaClient.obtenerListaCompleta();
+            Optional<ListaEsperaDTO> candidato = espera.stream()
+                    .filter(s -> "PENDIENTE".equalsIgnoreCase(s.getEstado()))
+                    .min(Comparator
+                            .comparingInt((ListaEsperaDTO s) -> ordenPrioridad(s.getPrioridad()))
+                            .thenComparing(ListaEsperaDTO::getCreadoEn,
+                                    Comparator.nullsLast(Comparator.naturalOrder())));
+
+            ReasignacionResultadoDTO resultado = ReasignacionResultadoDTO.builder()
+                    .citaCanceladaId(citaId)
+                    .build();
+
+            // 4a. Sin candidatos -> FALLIDA (la hora igual quedo liberada)
+            if (candidato.isEmpty()) {
+                resultado.setEstado("FALLIDA");
+                resultado.setMensaje("Cita cancelada. No hay pacientes en espera para reasignar.");
+                return ApiResponseDTO.ok(resultado, "Reasignacion procesada");
+            }
+
+            // 4b. Hay candidato -> crear la cita nueva en la hora liberada
+            ListaEsperaDTO elegido = candidato.get();
+
+            CitaRequestDTO nueva = CitaRequestDTO.builder()
+                    .pacienteId(elegido.getPacienteId())
+                    .fecha(citaOriginal.getFecha())
+                    .hora(citaOriginal.getHora())
+                    .nombreMedico(citaOriginal.getNombreMedico())
+                    .especialidad(citaOriginal.getEspecialidad())
+                    .centroSalud(citaOriginal.getCentroSalud())
+                    .motivo("Reasignacion automatica por cancelacion")
+                    .build();
+            CitaDTO citaNueva = citaClient.crear(nueva);
+
+            // 5. Marcar al paciente elegido como ASIGNADO en lista de espera
+            listaEsperaClient.cambiarEstado(elegido.getId(), Map.of("estado", "ASIGNADO"));
+
+            resultado.setEstado("COMPLETADA");
+            resultado.setNuevaCitaId(citaNueva.getId());
+            resultado.setPacienteReasignadoId(elegido.getPacienteId());
+            resultado.setPrioridad(elegido.getPrioridad());
+            resultado.setMensaje("Hora reasignada al paciente " + elegido.getPacienteId()
+                    + " (prioridad " + elegido.getPrioridad() + ")");
+
+            return ApiResponseDTO.ok(resultado, "Reasignacion completada");
+
+        } catch (FeignException.NotFound e) {
+            log.warn("BFF: cita no encontrada para reasignar: {}", citaId);
+            return ApiResponseDTO.error(404, "La cita indicada no existe");
+        } catch (Exception e) {
+            log.error("BFF: error en reasignacion: {}", e.getMessage());
+            return ApiResponseDTO.error(503, "No se pudo completar la reasignacion (servicio no disponible)");
+        }
+    }
+
+    // Prioridad: URGENTE (0) va primero, luego NORMAL (1), luego BAJA (2)
+    private int ordenPrioridad(String prioridad) {
+        if (prioridad == null) return 99;
+        switch (prioridad.toUpperCase()) {
+            case "URGENTE": return 0;
+            case "NORMAL":  return 1;
+            case "BAJA":    return 2;
+            default:        return 99;
+        }
     }
 
     //Fallbacks
