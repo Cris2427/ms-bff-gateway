@@ -26,6 +26,7 @@ import com.rednorte.bff_gateway.dto.CitaDTO;
 import com.rednorte.bff_gateway.dto.LoginRequestDTO;
 import com.rednorte.bff_gateway.dto.LoginResponseDTO;
 import com.rednorte.bff_gateway.dto.RegistroRequestDTO;
+import com.rednorte.bff_gateway.dto.CitaRequestDTO;
 
 import java.util.List;
 
@@ -170,5 +171,32 @@ public class BffController {
     public ResponseEntity<ApiResponseDTO<LoginResponseDTO>> registrar(
             @RequestBody RegistroRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(bffService.registrar(request));
+    }
+
+    @Operation(summary = "Agendar una nueva cita")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Cita agendada"),
+            @ApiResponse(responseCode = "400", description = "Datos invalidos")
+    })
+    @PostMapping("/citas")
+    public ResponseEntity<ApiResponseDTO<CitaDTO>> crearCita(
+            @RequestBody CitaRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(bffService.crearCita(request));
+    }
+
+    @Operation(summary = "Listar citas de un paciente")
+    @ApiResponse(responseCode = "200", description = "Citas del paciente")
+    @GetMapping("/citas/paciente/{pacienteId}")
+    public ResponseEntity<ApiResponseDTO<List<CitaDTO>>> obtenerCitasPorPaciente(
+            @PathVariable Long pacienteId) {
+        return ResponseEntity.ok(bffService.obtenerCitasPorPaciente(pacienteId));
+    }
+
+    @Operation(summary = "Listar citas de un medico")
+    @ApiResponse(responseCode = "200", description = "Citas del medico")
+    @GetMapping("/citas/medico")
+    public ResponseEntity<ApiResponseDTO<List<CitaDTO>>> obtenerCitasPorMedico(
+            @RequestParam String nombreMedico) {
+        return ResponseEntity.ok(bffService.obtenerCitasPorMedico(nombreMedico));
     }
 }

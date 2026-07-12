@@ -21,6 +21,7 @@ import com.rednorte.bff_gateway.dto.PacienteDTO;
 import com.rednorte.bff_gateway.client.PacienteClient;
 import com.rednorte.bff_gateway.dto.CitaDTO;
 import com.rednorte.bff_gateway.client.CitaClient;
+import com.rednorte.bff_gateway.dto.CitaRequestDTO;
 
 import java.util.List;
 
@@ -147,6 +148,42 @@ public class BffServiceImpl implements BffService {
             log.warn("BFF: registro invalido para: {}", request.getUsername());
             return ApiResponseDTO.error(400, "El usuario ya existe o los datos son invalidos");
         }
+    }
+
+    // Citas
+
+    /** {@inheritDoc} */
+    @Override
+    public ApiResponseDTO<CitaDTO> crearCita(CitaRequestDTO request) {
+        log.info("BFF: agendando cita para paciente ID: {}", request.getPacienteId());
+        try {
+            CitaDTO dto = citaClient.crear(request);
+            return ApiResponseDTO.ok(dto, "Cita agendada exitosamente");
+        } catch (FeignException.BadRequest e) {
+            log.warn("BFF: datos invalidos al agendar cita");
+            return ApiResponseDTO.error(400, "No se pudo agendar: la fecha debe ser futura y los datos completos");
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    @CircuitBreaker(name = "citasCB", fallbackMethod = "fallbackCitas")
+    public ApiResponseDTO<List<CitaDTO>> obtenerCitasPorPaciente(Long pacienteId) {
+        log.info("BFF: obteniendo citas del paciente ID: {}", pacienteId);
+        return ApiResponseDTO.ok(citaClient.obtenerPorPaciente(pacienteId), "Citas del paciente obtenidas");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    @CircuitBreaker(name = "citasCB", fallbackMethod = "fallbackCitas")
+    public ApiResponseDTO<List<CitaDTO>> obtenerCitasPorMedico(String nombreMedico) {
+        log.info("BFF: obteniendo citas del medico: {}", nombreMedico);
+        return ApiResponseDTO.ok(citaClient.obtenerPorMedico(nombreMedico), "Citas del medico obtenidas");
+    }
+
+    public ApiResponseDTO<CitaDTO> fallbackCita(Throwable t) {
+        log.error("Circuit Breaker activado para cita: {}", t.getMessage());
+        return ApiResponseDTO.error(503, "Servicio de citas no disponible temporalmente");
     }
 
     //Fallbacks

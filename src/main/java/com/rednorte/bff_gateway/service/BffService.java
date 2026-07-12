@@ -72,4 +72,11 @@ public interface BffService {
     ApiResponseDTO<LoginResponseDTO> login(LoginRequestDTO request);
 
     ApiResponseDTO<LoginResponseDTO> registrar(RegistroRequestDTO request);
+
+    // Citas
+    ApiResponseDTO<CitaDTO> crearCita(CitaRequestDTO request);
+
+    ApiResponseDTO<List<CitaDTO>> obtenerCitasPorPaciente(Long pacienteId);
+
+    ApiResponseDTO<List<CitaDTO>> obtenerCitasPorMedico(String nombreMedico);
 }
