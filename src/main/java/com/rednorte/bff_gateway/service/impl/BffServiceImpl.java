@@ -23,6 +23,8 @@ import com.rednorte.bff_gateway.dto.CitaDTO;
 import com.rednorte.bff_gateway.client.CitaClient;
 import com.rednorte.bff_gateway.dto.CitaRequestDTO;
 import com.rednorte.bff_gateway.dto.ReasignacionResultadoDTO;
+import com.rednorte.bff_gateway.dto.PacienteRequestDTO;
+import com.rednorte.bff_gateway.dto.RegistroPacienteDTO;
 
 import java.util.Comparator;
 import java.util.Map;
@@ -190,7 +192,7 @@ public class BffServiceImpl implements BffService {
         return ApiResponseDTO.error(503, "Servicio de citas no disponible temporalmente");
     }
 
-    // Reasignacion real (orquestada por el BFF)
+    // Reasignacion real
 
     /** {@inheritDoc} */
     @Override
@@ -266,6 +268,38 @@ public class BffServiceImpl implements BffService {
             case "NORMAL":  return 1;
             case "BAJA":    return 2;
             default:        return 99;
+        }
+    }
+
+    // Registro de paciente (orquestado: ficha en ms-pacientes + usuario en ms-auth)
+
+    /** {@inheritDoc} */
+    @Override
+    public ApiResponseDTO<LoginResponseDTO> registrarPaciente(RegistroPacienteDTO request) {
+        log.info("BFF: registrando paciente nuevo con usuario: {}", request.getUsername());
+        try {
+            // 1. Crear la ficha del paciente
+            PacienteRequestDTO fichaPaciente = PacienteRequestDTO.builder()
+                    .rut(request.getRut())
+                    .nombre(request.getNombre())
+                    .contacto(request.getContacto())
+                    .build();
+            PacienteDTO paciente = pacienteClient.crear(fichaPaciente);
+
+            // 2. Crear el usuario (rol PACIENTE) enlazado a esa ficha
+            RegistroRequestDTO nuevoUsuario = RegistroRequestDTO.builder()
+                    .username(request.getUsername())
+                    .password(request.getPassword())
+                    .nombre(request.getNombre())
+                    .rol("PACIENTE")
+                    .pacienteId(paciente.getId())
+                    .build();
+            LoginResponseDTO usuario = authClient.registrar(nuevoUsuario);
+
+            return ApiResponseDTO.ok(usuario, "Cuenta creada exitosamente");
+        } catch (FeignException.BadRequest e) {
+            log.warn("BFF: datos invalidos al registrar paciente");
+            return ApiResponseDTO.error(400, "No se pudo crear la cuenta: revisa los datos (usuario o RUT ya existentes)");
         }
     }
 

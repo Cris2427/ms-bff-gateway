@@ -28,6 +28,7 @@ import com.rednorte.bff_gateway.dto.LoginRequestDTO;
 import com.rednorte.bff_gateway.dto.LoginResponseDTO;
 import com.rednorte.bff_gateway.dto.RegistroRequestDTO;
 import com.rednorte.bff_gateway.dto.CitaRequestDTO;
+import com.rednorte.bff_gateway.dto.RegistroPacienteDTO;
 
 import java.util.List;
 
@@ -212,5 +213,16 @@ public class BffController {
             @PathVariable Long citaId,
             @RequestParam(required = false) String motivo) {
         return ResponseEntity.ok(bffService.procesarReasignacion(citaId, motivo));
+    }
+
+    @Operation(summary = "Registro de paciente", description = "Crea la ficha del paciente y su cuenta de acceso")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Cuenta creada"),
+            @ApiResponse(responseCode = "400", description = "Datos invalidos o usuario existente")
+    })
+    @PostMapping("/auth/registro-paciente")
+    public ResponseEntity<ApiResponseDTO<LoginResponseDTO>> registrarPaciente(
+            @RequestBody RegistroPacienteDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(bffService.registrarPaciente(request));
     }
 }
