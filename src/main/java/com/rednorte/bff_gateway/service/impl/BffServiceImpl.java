@@ -250,7 +250,9 @@ public class BffServiceImpl implements BffService {
                     + " (prioridad " + elegido.getPrioridad() + ")");
 
             return ApiResponseDTO.ok(resultado, "Reasignacion completada");
-
+        } catch (FeignException.BadRequest e) {
+            log.warn("BFF: no se pudo reasignar (horario/datos): {}", e.getMessage());
+            return ApiResponseDTO.error(400, "No se pudo reasignar: el horario ya esta ocupado o los datos no son validos");
         } catch (FeignException.NotFound e) {
             log.warn("BFF: cita no encontrada para reasignar: {}", citaId);
             return ApiResponseDTO.error(404, "La cita indicada no existe");
